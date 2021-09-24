@@ -1,3 +1,3 @@
 # WARNING!
-### Eucational Purpose Only
+### Educational Purpose Only
 Gunakan dengan BIJAK!
